@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Token values. Components reference semantic names (`bg-surface`, `text-danger`)
+ * and never raw hex, so dark mode is a variable swap rather than a rewrite.
+ *
+ * Contrast: every text-on-surface pair below clears WCAG AA (4.5:1) in both themes.
+ */
+:root {
+  --color-canvas: #f7f8fa;
+  --color-surface: #ffffff;
+  --color-raised: #ffffff;
+  --color-border: #e3e6ea;
+
+  --color-ink: #14181f;
+  --color-muted: #5a6472;
+  --color-subtle: #8b95a3;
+  --color-inverse: #ffffff;
+
+  --color-brand: #1668d6;
+  --color-brand-hover: #1257b3;
+  --color-brand-subtle: #e8f1fd;
+
+  --color-success: #12784a;
+  --color-success-subtle: #e6f4ed;
+  --color-warning: #97600a;
+  --color-warning-subtle: #fdf1dd;
+  --color-danger: #c0342b;
+  --color-danger-subtle: #fdeceb;
+
+  /* Realtime feed down — showing timetable instead of live positions. */
+  --color-stale: #97600a;
+  --color-stale-subtle: #fdf1dd;
+  /* Realtime feed healthy — live positions on the map. */
+  --color-live: #12784a;
+  --color-live-subtle: #e6f4ed;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-canvas: #0d1117;
+    --color-surface: #161b22;
+    --color-raised: #1c232c;
+    --color-border: #2c333d;
+
+    --color-ink: #e9edf2;
+    --color-muted: #a3adba;
+    --color-subtle: #75808e;
+    --color-inverse: #0d1117;
+
+    --color-brand: #61a2f5;
+    --color-brand-hover: #83b8f8;
+    --color-brand-subtle: #16293f;
+
+    --color-success: #56c98d;
+    --color-success-subtle: #14291f;
+    --color-warning: #e0aa4c;
+    --color-warning-subtle: #2c2313;
+    --color-danger: #f0847c;
+    --color-danger-subtle: #33191a;
+
+    --color-stale: #e0aa4c;
+    --color-stale-subtle: #2c2313;
+    --color-live: #56c98d;
+    --color-live-subtle: #14291f;
+  }
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  @apply bg-canvas text-ink font-sans text-body antialiased;
+}
+
+/* Focus must always be VISIBLE — this app will be used one-handed, in sunlight,
+   and by people navigating with a keyboard or switch device. */
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

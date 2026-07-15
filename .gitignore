@@ -1,0 +1,30 @@
+node_modules/
+.env
+.env.*
+!.env.example
+
+# build output
+dist/
+build/
+.next/
+coverage/
+
+# e2e artifacts (traces/screenshots of failed runs — regenerated, never reviewed)
+test-results/
+playwright-report/
+.playwright/
+
+# data / feeds (never commit GTFS zips)
+data/
+*.zip
+*.pb
+
+# logs
+*.log
+npm-debug.log*
+
+# os / editor
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
