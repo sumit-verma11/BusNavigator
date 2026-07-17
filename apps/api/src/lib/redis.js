@@ -23,5 +23,4 @@ export async function pingRedis() {
 export const keys = {
   vehiclesByRoute: (regionSlug, routeId) => `veh:${regionSlug}:route:${routeId}`,
   vehicle: (regionSlug, vehicleId) => `veh:${regionSlug}:${vehicleId}`,
-  feedHealth: (regionSlug) => `feed:health:${regionSlug}`,
 };

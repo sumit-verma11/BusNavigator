@@ -139,7 +139,7 @@ test('a stop from another region is a 404, not an empty result', async () => {
 });
 
 test('returns the route shape as GeoJSON ready for the map', async () => {
-  const res = await request(app).get(`/routes/${ids.routes.R1}/shape`);
+  const res = await request(app).get(`/routes/${ids.routes.R1}/shape`).query({ region: REGION });
 
   assert.equal(res.status, 200);
   assert.equal(res.body.data.geometry.type, 'LineString');
@@ -148,10 +148,27 @@ test('returns the route shape as GeoJSON ready for the map', async () => {
 });
 
 test('a route with no shape returns 404 rather than an empty geometry', async () => {
-  const res = await request(app).get(`/routes/${ids.routes.R2}/shape`);
+  const res = await request(app).get(`/routes/${ids.routes.R2}/shape`).query({ region: REGION });
 
   assert.equal(res.status, 404);
   assert.equal(res.body.error.code, 'shape_not_found');
+});
+
+test("a route id from another region is a 404, not that region's shape", async () => {
+  // Ids are sequential surrogate ints, not secrets — but a route belongs to the
+  // region it was ingested into, and one region's data must never leak through
+  // another region's endpoint just because the id happens to exist.
+  const other = await seedRegion('test-routes-other');
+  try {
+    const res = await request(app)
+      .get(`/routes/${other.routes.R1}/shape`)
+      .query({ region: REGION });
+
+    assert.equal(res.status, 404);
+    assert.equal(res.body.error.code, 'unknown_route');
+  } finally {
+    await dropRegion('test-routes-other');
+  }
 });
 
 after(async () => {

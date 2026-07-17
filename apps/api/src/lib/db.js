@@ -4,12 +4,33 @@ import { logger } from './logger.js';
 
 const { Pool } = pg;
 
+// Verifies the server certificate by default — rejectUnauthorized: false accepts
+// any certificate, including a forged one, and defeats the point of TLS. Only
+// disable it via DATABASE_SSL_REJECT_UNAUTHORIZED=false as an explicit, logged
+// choice, never silently.
+function sslConfig() {
+  if (!isProduction) return undefined;
+
+  if (!env.DATABASE_SSL_REJECT_UNAUTHORIZED) {
+    logger.warn(
+      'DATABASE_SSL_REJECT_UNAUTHORIZED=false — Postgres certificate verification is ' +
+        'DISABLED. The connection is vulnerable to MITM. Set DATABASE_SSL_CA to the ' +
+        "provider's CA instead, if at all possible.",
+    );
+  }
+
+  return {
+    rejectUnauthorized: env.DATABASE_SSL_REJECT_UNAUTHORIZED,
+    ca: env.DATABASE_SSL_CA || undefined,
+  };
+}
+
 export const pool = new Pool({
   connectionString: env.DATABASE_URL,
   max: 10,
   idleTimeoutMillis: 30_000,
   connectionTimeoutMillis: 5_000,
-  ssl: isProduction ? { rejectUnauthorized: false } : undefined,
+  ssl: sslConfig(),
 });
 
 pool.on('error', (err) => {

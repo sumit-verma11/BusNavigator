@@ -59,7 +59,8 @@ export const api = {
   searchRoutes: ({ region, from, to }, opts) =>
     request(`/routes/search${qs({ region, from, to })}`, opts),
 
-  routeShape: (routeId, opts) => request(`/routes/${routeId}/shape`, opts),
+  routeShape: ({ region, routeId }, opts) =>
+    request(`/routes/${routeId}/shape${qs({ region })}`, opts),
 
   liveVehicles: ({ region, route }, opts) =>
     request(`/vehicles/live${qs({ region, route })}`, opts),

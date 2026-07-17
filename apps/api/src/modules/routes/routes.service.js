@@ -186,8 +186,24 @@ function mapRoute(r) {
   };
 }
 
-/** The map needs the line, not the list of points. GeoJSON straight from PostGIS. */
-export async function getRouteShape(routeId) {
+/**
+ * The map needs the line, not the list of points. GeoJSON straight from PostGIS.
+ *
+ * Scoped by region like every other lookup here (GTFS ids, and therefore surrogate
+ * route ids, only ever mean something within their own feed) — a route id from one
+ * region must not return another region's shape just because ids are sequential.
+ */
+export async function getRouteShape(regionSlug, routeId) {
+  const region = await getRegionOrThrow(regionSlug);
+
+  const { rows: routeRows } = await query(
+    'SELECT id FROM routes WHERE id = $1 AND region_id = $2',
+    [routeId, region.id],
+  );
+  if (routeRows.length === 0) {
+    throw new AppError('Unknown route for this region', { status: 404, code: 'unknown_route' });
+  }
+
   const { rows } = await query(
     `SELECT r.id, r.short_name,
             ST_AsGeoJSON(sh.geom)::json AS geometry

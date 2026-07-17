@@ -10,3 +10,7 @@ export const routeSearchSchema = z.object({
 export const routeIdSchema = z.object({
   id: z.coerce.number().int().positive(),
 });
+
+export const routeShapeQuerySchema = z.object({
+  region: z.string().min(1).max(64).default('delhi'),
+});

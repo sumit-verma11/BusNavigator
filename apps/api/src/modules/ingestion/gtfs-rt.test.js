@@ -134,9 +134,6 @@ test('failures past the threshold flip has_realtime OFF', async () => {
   assert.equal(last.disabled, true);
   const region = await regionRow();
   assert.equal(region.has_realtime, false, 'a dead feed must not silently keep showing buses');
-
-  const health = JSON.parse(await redis.get(keys.feedHealth(REGION)));
-  assert.equal(health.healthy, false);
 });
 
 test('recovery after an outage turns realtime back ON', async () => {
@@ -153,7 +150,6 @@ after(async () => {
   if (region) {
     const stale = await redis.keys(`*:${REGION}:*`);
     if (stale.length) await redis.del(...stale);
-    await redis.del(keys.feedHealth(REGION));
   }
   await query('DELETE FROM supported_regions WHERE slug = $1', [REGION]);
   await Promise.allSettled([pool.end(), redis.quit()]);

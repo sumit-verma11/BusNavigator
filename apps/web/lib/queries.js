@@ -13,7 +13,7 @@ export const keys = {
   nearby: (p) => ['stops', 'nearby', p],
   stopSearch: (p) => ['stops', 'search', p],
   routeSearch: (p) => ['routes', 'search', p],
-  routeShape: (id) => ['routes', 'shape', id],
+  routeShape: (region, id) => ['routes', 'shape', region, id],
   vehicles: (p) => ['vehicles', 'live', p],
 };
 
@@ -52,10 +52,10 @@ export function useRouteSearch(params) {
   });
 }
 
-export function useRouteShape(routeId) {
+export function useRouteShape(region, routeId) {
   return useQuery({
-    queryKey: keys.routeShape(routeId),
-    queryFn: ({ signal }) => api.routeShape(routeId, { signal }),
+    queryKey: keys.routeShape(region, routeId),
+    queryFn: ({ signal }) => api.routeShape({ region, routeId }, { signal }),
     enabled: Boolean(routeId),
     staleTime: 24 * 60 * 60 * 1000, // a route's geometry is effectively static
     retry: false, // a route with no shape is a 404, not a transient failure

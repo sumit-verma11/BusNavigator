@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { routeSearchSchema, routeIdSchema } from './routes.schema.js';
+import { routeSearchSchema, routeIdSchema, routeShapeQuerySchema } from './routes.schema.js';
 import { searchDirectRoutes, getRouteShape } from './routes.service.js';
 
 export const routesRouter = Router();
@@ -16,7 +16,8 @@ routesRouter.get('/search', async (req, res, next) => {
 routesRouter.get('/:id/shape', async (req, res, next) => {
   try {
     const { id } = routeIdSchema.parse(req.params);
-    res.json({ data: await getRouteShape(id) });
+    const { region } = routeShapeQuerySchema.parse(req.query);
+    res.json({ data: await getRouteShape(region, id) });
   } catch (err) {
     next(err);
   }

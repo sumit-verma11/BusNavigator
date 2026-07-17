@@ -1,5 +1,4 @@
 import { query } from '../../lib/db.js';
-import { redis, keys } from '../../lib/redis.js';
 import { env } from '../../config/env.js';
 import { logger } from '../../lib/logger.js';
 
@@ -85,9 +84,4 @@ export async function recordPollFailure(regionId, error) {
   }
 
   return { failures, disabled: failures >= env.GTFS_RT_FAILURE_THRESHOLD };
-}
-
-/** Cached snapshot for the API to stamp `stale: true` on responses without a DB hit. */
-export async function publishHealthSnapshot(regionSlug, snapshot) {
-  await redis.set(keys.feedHealth(regionSlug), JSON.stringify(snapshot), 'EX', 300);
 }

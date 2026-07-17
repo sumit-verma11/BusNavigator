@@ -15,7 +15,7 @@ import { useRouteShape, useLiveVehicles } from '../../lib/queries.js';
  * The map still renders in every case. A dead feed costs you the buses, not the app.
  */
 export function LiveRouteMap({ region, route }) {
-  const shape = useRouteShape(route?.id);
+  const shape = useRouteShape(region, route?.id);
   const live = useLiveVehicles({ region, route: route?.id }, { enabled: Boolean(route) });
 
   if (!route) return null;

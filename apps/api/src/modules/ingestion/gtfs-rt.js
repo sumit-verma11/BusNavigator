@@ -4,7 +4,7 @@ import { redis, keys } from '../../lib/redis.js';
 import { env } from '../../config/env.js';
 import { logger } from '../../lib/logger.js';
 import { captureException } from '../../lib/monitoring.js';
-import { recordPollSuccess, recordPollFailure, publishHealthSnapshot } from './feed-health.js';
+import { recordPollSuccess, recordPollFailure } from './feed-health.js';
 
 const { FeedMessage } = GtfsRealtimeBindings.transit_realtime;
 const log = logger.child({ module: 'gtfs-rt' });
@@ -91,23 +91,11 @@ export async function pollOnce({ regionSlug = 'delhi', url, apiKey } = {}) {
 
     await pipeline.exec();
     await recordPollSuccess(region.id, vehicles.length);
-    await publishHealthSnapshot(regionSlug, {
-      healthy: true,
-      vehicleCount: vehicles.length,
-      updatedAt: new Date().toISOString(),
-    });
 
     log.debug({ regionSlug, vehicles: vehicles.length }, 'rt poll ok');
     return { vehicleCount: vehicles.length, vehicles };
   } catch (err) {
     const { failures, disabled } = await recordPollFailure(region.id, err);
-    await publishHealthSnapshot(regionSlug, {
-      healthy: false,
-      failures,
-      disabled,
-      lastError: err.message,
-      updatedAt: new Date().toISOString(),
-    });
     return { vehicleCount: 0, error: err.message, failures, disabled };
   }
 }

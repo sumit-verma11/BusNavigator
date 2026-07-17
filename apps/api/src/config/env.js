@@ -21,6 +21,18 @@ const schema = z.object({
   DATABASE_URL: z.string().url(),
   REDIS_URL: z.string().url(),
 
+  // PEM-encoded CA certificate for providers whose Postgres cert isn't signed by a
+  // publicly trusted root (common with a managed provider's default cert). Leave
+  // unset when the provider uses a publicly trusted cert (Node's default trust
+  // store already verifies those).
+  DATABASE_SSL_CA: z.string().optional(),
+  // Escape hatch only. Silently trusting any certificate defeats the point of TLS —
+  // this must be an explicit, loud opt-in (and logged, see db.js), never a default.
+  DATABASE_SSL_REJECT_UNAUTHORIZED: z
+    .enum(['true', 'false'])
+    .default('true')
+    .transform((v) => v === 'true'),
+
   GTFS_STATIC_URL: z.string().url().optional(),
   GTFS_RT_VEHICLE_POSITIONS_URL: z.string().url().optional(),
   GTFS_RT_API_KEY: z.string().optional(),
