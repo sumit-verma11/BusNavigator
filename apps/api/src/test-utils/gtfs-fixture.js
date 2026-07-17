@@ -13,7 +13,7 @@ import { ingestStaticFeed } from '../modules/ingestion/gtfs-static.js';
  * Route 764 runs S1->S2->S3 on weekdays; route 500 runs the reverse (S3->S1) so that
  * direction actually means something in the tests.
  */
-export function buildFixtureZip({ serviceDays = '1,1,1,1,1,1,1' } = {}) {
+export function buildFixtureZip({ serviceDays = '1,1,1,1,1,1,1', withNearbyStop = false } = {}) {
   const zip = new AdmZip();
   const add = (name, content) => zip.addFile(name, Buffer.from(content, 'utf8'));
 
@@ -26,7 +26,11 @@ export function buildFixtureZip({ serviceDays = '1,1,1,1,1,1,1' } = {}) {
     'stop_id,stop_code,stop_name,stop_lat,stop_lon\n' +
       'S1,101,Nehru Place,28.5483,77.2513\n' +
       'S2,102,Kalkaji Mandir,28.5355,77.2590\n' +
-      'S3,103,Anand Vihar ISBT,28.6469,77.3159\n',
+      'S3,103,Anand Vihar ISBT,28.6469,77.3159\n' +
+      // S4 sits ~100m from S1 and is served by no trip. It exists so a test can pick
+      // it as an origin and prove the fallback finds the bus that leaves from S1
+      // nearby — the "one place, many stop ids, newcomer picks the wrong one" case.
+      (withNearbyStop ? 'S4,104,Nehru Place Metro Gate 2,28.5490,77.2520\n' : ''),
   );
   add(
     'routes.txt',

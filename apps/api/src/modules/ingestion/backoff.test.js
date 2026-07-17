@@ -1,8 +1,17 @@
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { nextPollDelay } from './gtfs-rt.js';
+import { pool } from '../../lib/db.js';
+import { redis } from '../../lib/redis.js';
 
 const noJitter = { random: () => 0 };
+
+// nextPollDelay is a pure function, but it lives in gtfs-rt.js, which opens the
+// Redis + Postgres connections at import. Without closing them this file's isolated
+// subprocess never exits — it passes, then hangs the whole `npm test` run forever.
+after(async () => {
+  await Promise.allSettled([pool.end(), redis.quit()]);
+});
 
 test('a healthy feed keeps its steady cadence', () => {
   assert.equal(nextPollDelay(0, 10_000, noJitter), 10_000);

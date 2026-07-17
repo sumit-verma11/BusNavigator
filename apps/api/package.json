@@ -14,7 +14,8 @@
     "migrate:create": "npm run migrate -- create",
     "ingest:static": "node src/bin/ingest-static.js",
     "poll:realtime": "node src/bin/poll-realtime.js",
-    "seed:sample": "node src/bin/seed-sample.js"
+    "seed:sample": "node src/bin/seed-sample.js",
+    "dev:refresh": "node src/bin/dev-refresh.js"
   },
   "dependencies": {
     "adm-zip": "^0.6.0",

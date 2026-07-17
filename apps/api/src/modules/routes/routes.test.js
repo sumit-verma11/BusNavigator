@@ -21,7 +21,7 @@ function istAt(hhmm) {
 }
 
 before(async () => {
-  ids = await seedRegion(REGION);
+  ids = await seedRegion(REGION, { withNearbyStop: true });
 });
 
 test('finds the direct route between two stops', async () => {
@@ -33,6 +33,34 @@ test('finds the direct route between two stops', async () => {
   assert.equal(res.body.data.length, 1);
   assert.equal(res.body.data[0].shortName, '764');
   assert.equal(res.body.data[0].stopsBetween, 1); // S1 -> S3 via T3 is one hop
+});
+
+test('an exact match names no nearby stop', async () => {
+  // When the bus leaves from the stop you actually picked, there is nothing to
+  // explain — boardAt/alightAt stay null so the UI shows no "walk to" note.
+  const res = await request(app)
+    .get('/routes/search')
+    .query({ region: REGION, from: ids.stops.S1, to: ids.stops.S3 });
+
+  assert.equal(res.body.data[0].boardAt, null);
+  assert.equal(res.body.data[0].alightAt, null);
+});
+
+test('falls back to a walkable stop when the exact stop has no bus', async () => {
+  // S4 (Nehru Place Metro) is served by no trip — the classic "newcomer picks the
+  // wrong stop id for the right place". No exact bus exists, but S1 ~100m away runs
+  // the 764 to S3, so we surface it and say where to actually board.
+  const res = await request(app)
+    .get('/routes/search')
+    .query({ region: REGION, from: ids.stops.S4, to: ids.stops.S3 });
+
+  assert.equal(res.status, 200);
+  assert.equal(res.body.data.length, 1, 'the nearby bus must be found, not hidden');
+  const route = res.body.data[0];
+  assert.equal(route.shortName, '764');
+  assert.equal(route.boardAt.name, 'Nehru Place', 'must name the stop the bus leaves from');
+  assert.ok(route.boardAt.distanceM > 0, 'and how far to walk to it');
+  assert.equal(route.alightAt, null, 'the destination stop was exact, so nothing to add there');
 });
 
 test('direction matters: the reverse leg is served by a different route', async () => {

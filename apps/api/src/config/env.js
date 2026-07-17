@@ -27,6 +27,15 @@ const schema = z.object({
   GTFS_RT_POLL_INTERVAL_MS: z.coerce.number().int().min(1000).default(10_000),
   GTFS_RT_FAILURE_THRESHOLD: z.coerce.number().int().min(1).default(5),
 
+  // When a direct search on the exact picked stop finds nothing, we retry over
+  // stops within this radius and tell the user which nearby stop the bus actually
+  // leaves from. GTFS splits one physical place ("Azadpur") into many stop ids
+  // (platforms, directions, terminals) and a newcomer picks by name, not id — so
+  // the buses are usually a short walk away, not absent. 800m is the classic
+  // half-mile transit walkshed; it's surfaced to the user as an exact distance,
+  // never a hidden merge.
+  ROUTE_FALLBACK_RADIUS_M: z.coerce.number().int().positive().default(800),
+
   SENTRY_DSN: z.string().url().optional(),
 
   CORS_ORIGIN: z.string().default('http://localhost:3000'),

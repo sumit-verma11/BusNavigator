@@ -36,65 +36,95 @@ export function RouteResults({ region, origin, destination, selectedRouteId, onS
         title="No direct bus"
         // Says exactly what we checked and what we didn't. "No routes found" would
         // imply you can't get there at all, which is usually false.
-        message={`No single bus runs from ${origin.name} to ${destination.name}. Journeys with a change aren't supported yet — try a nearby stop.`}
+        message={`No single bus runs from ${origin.name} to ${destination.name}, even from stops nearby. Journeys with a change aren't supported yet — try a different stop.`}
       />
     );
   }
 
+  // The API widens the search to walkable stops when the exact pair has no bus —
+  // GTFS splits one place into many stop ids, and a newcomer picks by name. If any
+  // result boards or alights somewhere other than the picked stop, say so up front.
+  const fromNearby = data.some((route) => route.boardAt || route.alightAt);
+
   return (
-    <ul className="flex flex-col gap-3">
-      {data.map((route) => {
-        const selected = route.id === selectedRouteId;
-        const gone = route.nextDepartures.length === 0;
+    <div className="flex flex-col gap-3">
+      {fromNearby && (
+        <p
+          role="status"
+          className="rounded-md border border-border bg-canvas px-3 py-2 text-caption text-muted"
+        >
+          No bus leaves from {origin.name} itself — these run from stops a short walk away.
+        </p>
+      )}
+      <ul className="flex flex-col gap-3">
+        {data.map((route) => {
+          const selected = route.id === selectedRouteId;
+          const gone = route.nextDepartures.length === 0;
 
-        return (
-          <li key={route.id}>
-            <Card
-              as="button"
-              interactive
-              onClick={() => onSelect(route)}
-              aria-pressed={selected}
-              className={clsx(
-                'flex w-full items-center gap-4',
-                selected && 'border-brand bg-brand-subtle',
-              )}
-            >
-              <RouteBadge shortName={route.shortName} color={route.color} />
-
-              <div className="flex min-w-0 flex-1 flex-col items-start gap-2">
-                <p className="truncate text-left font-medium text-ink">
-                  {route.longName ?? 'Bus route'}
-                </p>
-
-                {gone ? (
-                  // NOT the same as "no such route" — the bus exists, it's just done
-                  // for the day. Different sentence, because it's a different problem.
-                  <p className="text-small text-muted">No more buses today</p>
-                ) : (
-                  // Departure times as chips: a commuter scans for the next number,
-                  // they don't read a sentence.
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="text-caption text-subtle">Next</span>
-                    {route.nextDepartures.map((d) => (
-                      <span
-                        key={`${d.time}-${d.nextDay}`}
-                        className="rounded-sm bg-canvas px-2 py-0.5 font-mono text-caption font-medium text-ink"
-                      >
-                        {d.time}
-                        {d.nextDay && <span className="text-subtle"> +1</span>}
-                      </span>
-                    ))}
-                  </div>
+          return (
+            <li key={route.id}>
+              <Card
+                as="button"
+                interactive
+                onClick={() => onSelect(route)}
+                aria-pressed={selected}
+                className={clsx(
+                  'flex w-full items-center gap-4',
+                  selected && 'border-brand bg-brand-subtle',
                 )}
-              </div>
+              >
+                <RouteBadge shortName={route.shortName} color={route.color} />
 
-              <span className="shrink-0 text-caption text-subtle">
-                {route.stopsBetween} {route.stopsBetween === 1 ? 'stop' : 'stops'}
-              </span>
-            </Card>
-          </li>
-        );
-      })}
-    </ul>
+                <div className="flex min-w-0 flex-1 flex-col items-start gap-2">
+                  <p className="truncate text-left font-medium text-ink">
+                    {route.longName ?? 'Bus route'}
+                  </p>
+
+                  {(route.boardAt || route.alightAt) && (
+                    <div className="flex w-full flex-col items-start gap-0.5 text-caption text-subtle">
+                      {route.boardAt && (
+                        <span className="truncate">
+                          Board at {route.boardAt.name} · {route.boardAt.distanceM} m walk
+                        </span>
+                      )}
+                      {route.alightAt && (
+                        <span className="truncate">
+                          Get off at {route.alightAt.name} · {route.alightAt.distanceM} m
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {gone ? (
+                    // NOT the same as "no such route" — the bus exists, it's just done
+                    // for the day. Different sentence, because it's a different problem.
+                    <p className="text-small text-muted">No more buses today</p>
+                  ) : (
+                    // Departure times as chips: a commuter scans for the next number,
+                    // they don't read a sentence.
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="text-caption text-subtle">Next</span>
+                      {route.nextDepartures.map((d) => (
+                        <span
+                          key={`${d.time}-${d.nextDay}`}
+                          className="rounded-sm bg-canvas px-2 py-0.5 font-mono text-caption font-medium text-ink"
+                        >
+                          {d.time}
+                          {d.nextDay && <span className="text-subtle"> +1</span>}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <span className="shrink-0 text-caption text-subtle">
+                  {route.stopsBetween} {route.stopsBetween === 1 ? 'stop' : 'stops'}
+                </span>
+              </Card>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }

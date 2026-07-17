@@ -60,6 +60,18 @@ export function NearbyStops({ region, onPick }) {
   if (isPending) return <ListSkeleton rows={3} />;
 
   if (isError) {
+    // Being physically outside the selected city is expected, not an error: you're
+    // in Delhi but browsing Faridabad. Say so plainly rather than crying "failed" —
+    // same rule the four-states doctrine applies to a denied location prompt.
+    if (error?.code === 'out_of_region') {
+      return (
+        <Empty
+          title="You're outside this city"
+          message="Your location isn't in the city you've selected. Pick the city you're in, or search for a stop by name above."
+        />
+      );
+    }
+
     return (
       <ErrorState
         title="Couldn't load nearby stops"
