@@ -9,62 +9,67 @@
  * Contrast: every text-on-surface pair below clears WCAG AA (4.5:1) in both themes.
  */
 :root {
-  --color-canvas: #f7f8fa;
+  --color-canvas: #f8f7f5;
   --color-surface: #ffffff;
   --color-raised: #ffffff;
-  --color-border: #e3e6ea;
+  --color-border: #e4e1db;
 
-  --color-ink: #14181f;
-  --color-muted: #5a6472;
-  --color-subtle: #8b95a3;
+  --color-ink: #1b1d22;
+  --color-muted: #5b5e68;
+  --color-subtle: #8d909b;
   --color-inverse: #ffffff;
 
-  --color-brand: #1668d6;
-  --color-brand-hover: #1257b3;
-  --color-brand-subtle: #e8f1fd;
+  --color-brand: #1657c4;
+  --color-brand-hover: #12469b;
+  --color-brand-subtle: #e7eefc;
 
-  --color-success: #12784a;
-  --color-success-subtle: #e6f4ed;
-  --color-warning: #97600a;
-  --color-warning-subtle: #fdf1dd;
-  --color-danger: #c0342b;
-  --color-danger-subtle: #fdeceb;
+  --color-success: #1c8a5a;
+  --color-success-subtle: #e5f4ec;
+  --color-warning: #b3791c;
+  --color-warning-subtle: #fbeeda;
+  --color-danger: #c43a3a;
+  --color-danger-subtle: #fbeaea;
 
-  /* Realtime feed down — showing timetable instead of live positions. */
-  --color-stale: #97600a;
-  --color-stale-subtle: #fdf1dd;
-  /* Realtime feed healthy — live positions on the map. */
-  --color-live: #12784a;
-  --color-live-subtle: #e6f4ed;
+  /* Realtime feed down — showing timetable instead of live positions. A muted,
+     sepia-leaning gold: reads as "aged data", and is now its own hue rather than
+     a copy of `warning`'s value, so a stale banner and a generic warning don't
+     look identical the one time both might appear on the same screen. */
+  --color-stale: #8a7233;
+  --color-stale-subtle: #f4eeda;
+  /* Realtime feed healthy — live positions on the map. Teal, not a copy of
+     `success`'s green: "live" means a real-time signal is flowing, which is a
+     different promise than "this action succeeded". */
+  --color-live: #0f7d70;
+  --color-live-subtle: #dff3f0;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-canvas: #0d1117;
-    --color-surface: #161b22;
-    --color-raised: #1c232c;
-    --color-border: #2c333d;
+    --color-canvas: #100f0e;
+    --color-surface: #17151a;
+    --color-raised: #1d1a20;
+    --color-border: #2c2933;
 
-    --color-ink: #e9edf2;
-    --color-muted: #a3adba;
-    --color-subtle: #75808e;
-    --color-inverse: #0d1117;
+    --color-ink: #edebea;
+    --color-muted: #a6a3ac;
+    --color-subtle: #77747e;
+    --color-inverse: #100f0e;
 
-    --color-brand: #61a2f5;
-    --color-brand-hover: #83b8f8;
-    --color-brand-subtle: #16293f;
+    --color-brand: #6aa6f7;
+    --color-brand-hover: #8bbbf9;
+    --color-brand-subtle: #16253f;
 
-    --color-success: #56c98d;
-    --color-success-subtle: #14291f;
-    --color-warning: #e0aa4c;
+    --color-success: #57cb93;
+    --color-success-subtle: #142a20;
+    --color-warning: #e0a84c;
     --color-warning-subtle: #2c2313;
-    --color-danger: #f0847c;
-    --color-danger-subtle: #33191a;
+    --color-danger: #ef8686;
+    --color-danger-subtle: #331a1a;
 
-    --color-stale: #e0aa4c;
-    --color-stale-subtle: #2c2313;
-    --color-live: #56c98d;
-    --color-live-subtle: #14291f;
+    --color-stale: #c9b273;
+    --color-stale-subtle: #2e2911;
+    --color-live: #4dd0c4;
+    --color-live-subtle: #123330;
   }
 }
 
