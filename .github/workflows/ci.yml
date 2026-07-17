@@ -118,7 +118,7 @@ jobs:
       - name: API server log
         if: always()
         run: cat api.log || true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-traces
